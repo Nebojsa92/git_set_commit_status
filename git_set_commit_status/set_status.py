@@ -2,12 +2,12 @@ import json
 import urllib.request
 import urllib.parse
 import git_set_commit_status.utils as utils
-from git_set_commit_status.consts import API
+from git_set_commit_status.consts import API, PROVIDERS
 
 
 def set(
     state,
-    git_token="",
+    git_token,
     revision="",
     provider="",
     description="",
@@ -25,13 +25,14 @@ def set(
     if webhook_payload == {} and revision == "":
         print("Either 'webhook_payload' or 'revision' required.")
         return False
-    if revision:
-        print("revision")
 
     # PREPARE PROVIDER
     provider = provider if provider != "" else utils.get_provider(
         webhook_payload)
     if provider == False:
+        return False
+    if provider not in PROVIDERS:
+        print("Unknown git provider '%s'" % provider)
         return False
 
     # PREPARE REVISION
@@ -64,6 +65,7 @@ def set(
 
     if provider == "github":
         # data
+        data["state"] = state
         if description:
             data["description"] = description
         if target_url:
@@ -81,6 +83,8 @@ def set(
         data = None
 
         # qs
+        qs = {}
+        qs["state"] = state
         if description:
             qs["description"] = description
         if target_url:
@@ -101,15 +105,23 @@ def set(
         headers=headers,
         method=method
     )
-    print(provider, revision, state, url)
+    print("""
+Data:
+  - provider: %s,
+  - revision: %s,
+  - state: %s,
+  - url: %s
+""" % (provider,revision,state,url))
 
     try:
         response = urllib.request.urlopen(req)
-        utils.pretty_print(response)
-        return response
+        decoded_response = response.read().decode()
+        utils.pretty_print(decoded_response)
+        return decoded_response
     except urllib.error.HTTPError as e:
-        utils.pretty_print(e.read().decode())
-        return e
+        decoded_response = e.read().decode()
+        utils.pretty_print(decoded_response)
+        return decoded_response
 
 
 

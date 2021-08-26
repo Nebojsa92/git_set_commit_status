@@ -22,7 +22,6 @@ STATES = {
     }
 }
 
-
 PROVIDERS = ["github", "gitlab"]
 
 API = {

@@ -88,9 +88,10 @@ def get_state(state, provider):
 
 
 def pretty_print(dict):
+    print(dict)
     print(
         json.dumps(
             dict,
-            indent=4
+            indent=2
         )
     )

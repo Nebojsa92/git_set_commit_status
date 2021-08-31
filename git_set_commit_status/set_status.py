@@ -116,7 +116,7 @@ Data:
     try:
         response = urllib.request.urlopen(req)
         decoded_response = response.read().decode()
-        utils.pretty_print(decoded_response)
+        # utils.pretty_print(decoded_response)
         return decoded_response
     except urllib.error.HTTPError as e:
         decoded_response = e.read().decode()
